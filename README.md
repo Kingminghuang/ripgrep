@@ -503,6 +503,32 @@ build a static executable with MUSL and with PCRE2, then you will need to have
 `musl-gcc` installed, which might be in a separate package from the actual
 MUSL library, depending on your Linux distribution.
 
+ripgrep can also be built for WASIX via `cargo-wasix`:
+
+```
+$ cargo install cargo-wasix
+$ cargo wasix build --release
+```
+
+This uses the `wasm32-wasmer-wasi` target and writes the WebAssembly artifact
+to `target/wasm32-wasmer-wasi/release/rg.wasm`.
+
+At the time of writing, the WASIX build is compile-only in this repository's
+documented workflow. Running it locally with `cargo wasix run` additionally
+requires `wasmer` to be installed and available in `PATH`.
+
+The WASIX build currently has some important limitations:
+
+* It does not build the optional `pcre2` feature. PCRE2 depends on a native C
+  library toolchain and is not part of the documented WASIX build.
+* Some platform-specific behavior is compiled out on non-Unix/non-Windows
+  targets. For example, hyperlink generation is disabled, stdin readability
+  falls back to "not readable," and parts of recursive directory traversal use
+  placeholder implementations that can report an unsupported platform error.
+* Unix-specific byte-preserving path/config handling is unavailable, so behavior
+  on non-UTF-8 paths or config input should not be expected to match Unix
+  builds.
+
 
 ### Running tests
 
